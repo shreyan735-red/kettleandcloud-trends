@@ -5,15 +5,15 @@
 > footage listed here is read-only: the kit never edits, moves or overwrites it.
 
 ## Project
-- **What this is, in one line:** <e.g. 40-minute podcast episode → three 45-second shorts>
-- **Owner:** <who approves cuts and renders>
-- **Brief:** <path to video-brief.md, or "none">
+- **What this is, in one line:** 5-second vertical teaser reel, "Slow mornings" for Kettle & Cloud (HyperFrames, project in reel/)
+- **Owner:** shreyan
+- **Brief:** none
 
 ## Source footage
 <!-- Read-only. Record what ffprobe reports, not what the file name says. -->
 | File | Duration | Resolution / fps | Audio | Notes |
 |---|---|---|---|---|
-| <footage/ep12.mp4> | <00:41:20> | <3840x2160 / 29.97> | <stereo, 48 kHz> | <two cameras, host left> |
+| none | n/a | n/a | n/a | Built from HTML/CSS shapes, no source footage |
 
 ## Style
 - **Pace:** <e.g. cut every 2–4 s; no jump cuts mid-sentence>
@@ -25,13 +25,13 @@
 <!-- One row per output. A render is checked against its row: frame samples, ffprobe and a loudness measurement. -->
 | Target | Resolution | fps | Codec / container | Loudness | Safe zone |
 |---|---|---|---|---|---|
-| <Shorts / Reels> | <1080x1920> | <30> | <H.264 + AAC / mp4> | <-14 LUFS, -1 dBTP> | <keep text out of the bottom 20% and top 10%> |
+| Shorts / Reels | 1080x1920 | 30 | H.264 / mp4, silent | none (no audio) | HyperFrames TikTok/Reels/Shorts safe zone |
 
 ## Assets
 <!-- Music, fonts, stock clips, logos, SFX. An asset without a licence row never enters a render. -->
 | Asset | Source | Licence | Attribution needed | Checked |
 |---|---|---|---|---|
-| <music/bed.mp3> | <site or author> | <licence name + link> | <yes: "..." / no> | <date> |
+| Playfair Display, Inter (fonts) | bundled with HyperFrames | open fonts bundled by the tool | no | 2026-11-21 |
 
 ## Evidence
 <!-- Every number or claim shown on screen or in subtitles needs a row. No row → [NEEDS PROOF]. -->
