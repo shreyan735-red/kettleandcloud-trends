@@ -4,7 +4,7 @@ import wave
 
 import numpy as np
 
-from audio import N, SR, add, boom, env, glitch, heartbeat, load_mp3, pad, piano, rng, tick, tone, whoosh
+from audio import N, SR, add, boom, env, glitch, heartbeat, horn, load_mp3, pad, piano, rng, tick, tone, whoosh
 
 
 def rain_noise(dur, vol=0.08):
@@ -98,6 +98,40 @@ def part3(music, sfx):
     add(music, pad([130.8, 196, 261.6], 7.8, 0.05), 52.2)
 
 
+def part4(music, sfx):
+    # hook: timers pop in one by one
+    for k in range(7):
+        add(sfx, beep(900 + k * 90, 0.08, 0.09), 0.9 + k * 0.32)
+    add(music, pad([55, 82.4, 110], 12.0, 0.09), 0)
+    add(sfx, boom(1.0), 7.2, 0.3)  # "except one man"
+    add(music, pad([46.2, 69.3, 92.5], 10.0, 0.12), 12.0)
+    for seg in range(3):  # three zeros
+        for k in range(2):
+            add(sfx, tick(True), 12.0 + seg * 3.3 + k * 0.7, 0.7)
+        add(sfx, beep(1000, 0.6, 0.1), 13.5 + seg * 3.3)
+    add(sfx, whoosh(0.5), 21.8, 0.6)
+    for k in range(8):
+        add(sfx, tick(k % 2 == 0), 23.5 + k * 0.9, 0.7)
+    add(sfx, heartbeat(), 24.2, 0.8)
+    add(music, pad([49, 73.4, 98], 16.0, 0.12), 22.0)
+    add(sfx, horn(1.4), 30.8, 0.9)
+    for k, at in enumerate(np.cumsum([0.6, 0.55, 0.5, 0.45, 0.42]) + 29.8):
+        add(sfx, heartbeat(), at, 0.8)
+    add(sfx, whoosh(0.9), 32.4, 1.0)
+    add(sfx, boom(1.0), 33.2, 0.35)
+    # hood reveal: rising shimmer, then soft piano for "it was him"
+    t = np.arange(int(2.4 * SR)) / SR
+    add(sfx, np.sin(2 * np.pi * (300 + 400 * t) * t) * env(len(t), 0.4, 0.6) * 0.10, 40.6)
+    add(music, pad([110, 164.8, 220], 9.0, 0.05), 38.0)
+    for k, f in enumerate([329.6, 293.7, 261.6, 246.9]):
+        add(music, piano(f, 2.0), 47.6 + k * 0.9, 0.09)
+    # sorry + counting up
+    add(music, pad([41.2, 61.7, 82.4], 9.0, 0.14), 51.0)
+    for k in range(9):
+        add(sfx, tick(True), 55.2 + k * 0.5, 0.6)
+    add(sfx, boom(1.5), 58.2, 0.45)
+
+
 def main(part, out):
     vo = load_mp3(f"vo_p{part}.mp3")
     voice, music, sfx = np.zeros(N), np.zeros(N), np.zeros(N)
@@ -107,7 +141,7 @@ def main(part, out):
         a, b, at = map(float, ln.split())
         seg = vo[int(a * SR): int((b + 0.12) * SR)]
         add(voice, seg * env(len(seg), 0.01, 0.06), at)
-    (part2 if part == "2" else part3)(music, sfx)
+    {"2": part2, "3": part3, "4": part4}[part](music, sfx)
     mixd = np.tanh((voice + music * 0.9 + sfx * 0.8) * 1.1) * 0.92
     pcm = (np.clip(mixd, -1, 1) * 32767).astype(np.int16)
     with wave.open(out, "wb") as w:
