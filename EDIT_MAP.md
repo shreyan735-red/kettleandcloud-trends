@@ -25,12 +25,13 @@
 <!-- One row per output. A render is checked against its row: frame samples, ffprobe and a loudness measurement. -->
 | Target | Resolution | fps | Codec / container | Loudness | Safe zone |
 |---|---|---|---|---|---|
-| Shorts / Reels | 1080x1920 | 30 | H.264 / mp4, silent | none (no audio) | HyperFrames TikTok/Reels/Shorts safe zone |
+| Shorts / Reels | 1080x1920 | 30 | H.264 + AAC / mp4 | -14 LUFS, -1 dBTP | HyperFrames TikTok/Reels/Shorts safe zone |
 
 ## Assets
 <!-- Music, fonts, stock clips, logos, SFX. An asset without a licence row never enters a render. -->
 | Asset | Source | Licence | Attribution needed | Checked |
 |---|---|---|---|---|
+| whoosh-short.mp3, whoosh.mp3, sparkle.mp3 (reel/assets/sfx) | HyperFrames media-use bundled library (from Pixabay) | Pixabay Content License, https://pixabay.com/service/license-summary/ | no | 2026-11-21 |
 | Playfair Display, Inter (fonts) | bundled with HyperFrames | open fonts bundled by the tool | no | 2026-11-21 |
 
 ## Evidence
@@ -42,3 +43,4 @@
 ## Learnings
 <!-- What a cut or render taught you, with the number that showed it. -->
 - <date>: <what was tried> → <result> → <what changes next time>
+- 2026-11-21: first render was flat and silent → added gradients, shading, stars, 3 SFX, delivery quality → 1080x1920 30fps 5.0 s, -14.2 LUFS, -2.0 dBFS peak

@@ -11,7 +11,7 @@
       {
         "code": "timeline_track_too_dense",
         "severity": "warning",
-        "message": "This HTML file has 10 timed elements. Smaller sub-compositions keep timelines easier to read, iterate on, and diff.",
+        "message": "This HTML file has 11 timed elements. Smaller sub-compositions keep timelines easier to read, iterate on, and diff.",
         "selector": "[data-composition-id]",
         "dataAttributes": {},
         "sourceFile": "/home/user/kettleandcloud-trends/reel/index.html",
@@ -255,24 +255,8 @@
     "ok": true,
     "errorCount": 0,
     "warningCount": 0,
-    "infoCount": 1,
-    "findings": [
-      {
-        "code": "audio_none",
-        "severity": "info",
-        "message": "The film has no sound: no clip in it plays audio.",
-        "selector": "[data-composition-id]",
-        "dataAttributes": {},
-        "sourceFile": "index.html",
-        "bbox": {
-          "x": 0,
-          "y": 0,
-          "width": 0,
-          "height": 0
-        },
-        "time": 0
-      }
-    ]
+    "infoCount": 0,
+    "findings": []
   },
   "hdr": {
     "autoPromotion": null,
