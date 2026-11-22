@@ -85,7 +85,7 @@ def sc_grab(d, t):
     hood_item(d, 700, ground - 140, 0.6)
     figure(d, 500, ground, 1.15, facing=1, girl=True, c=PALE, arms=[(1.5, 0.0), (0.2, 0.2)])
     figure(d, 300, ground, 1.15, facing=1, c=PALE)
-    if t > 1.2:
+    if t > 1.8:
         bubble(d, 520, 600, "YOU DON'T HAVE TO DO THIS.", 48, 560)
 
 
@@ -96,9 +96,9 @@ def sc_laugh(d, t):
     figure(d, 300, ground, 1.15, facing=1, c=PALE)
     arrive = ease(t / 1.4)
     elder(d, lerp(1200, 880, arrive), ground, 1.45)
-    if t > 1.4:
+    if t > 1.0:
         text(d, (900, ground - 520), "HA HA HA", 46, c=RED)
-    if t > 2.6:
+    if t > 2.0:
         bubble(d, 560, 600, "THEN SOMEONE HAS TO.", 54, 520)
 
 
@@ -123,8 +123,8 @@ def sc_idea(d, t):
     teen(d, 600, ground, 1.25, c=PALE, arms=[(2.8, 0.2), (0.2, 0.2)])
     elder(d, 880, ground, 1.45)
     if t > 0.6:
-        text(d, (600, ground - 470), "!", 100, c=(255, 210, 80)) if t < 3.4 else None
-    if t > 3.4:
+        text(d, (600, ground - 470), "!", 100, c=(255, 210, 80)) if t < 4.4 else None
+    if t > 4.4:
         bubble(d, 560, 640, "WHAT IF EVERYONE PAYS… JUST A LITTLE?", 46, 620)
     text(d, (W / 2, 260), "THEN THE BOY SAID…", 64, c=WHITE)
     if t > 7.6:

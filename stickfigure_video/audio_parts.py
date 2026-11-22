@@ -190,6 +190,52 @@ def part6(music, sfx):
     add(sfx, boom(1.6), 58.2, 0.5)
 
 
+def part7(music, sfx):
+    for k in range(4):
+        add(sfx, tick(True), 0.3 + k * 0.7, 0.6)
+    add(sfx, heartbeat(), 2.4, 0.8)
+    add(sfx, heartbeat(), 3.3, 0.8)
+    add(music, pad([46.2, 69.3, 92.5], 13.0, 0.11), 0)
+    add(sfx, rain_noise(7.0, 0.08), 6.0)
+    for k in range(12):
+        add(sfx, tick(False) * 0.6, 6.3 + k * 0.5, 0.5)
+    add(music, pad([36.7, 55, 73.4], 23.0, 0.15), 13.0)  # the elder: deepest drone
+    add(sfx, whoosh(1.0), 13.2, 0.7)
+    add(sfx, boom(1.4), 15.0, 0.4)
+    add(sfx, glitch(0.3), 30.0, 0.5)
+    for k in range(20):  # debt spreading
+        add(sfx, beep(500 + (k % 6) * 90, 0.05, 0.06), 30.2 + k * 0.15)
+    add(music, pad([41.2, 61.7, 82.4], 24.0, 0.14), 36.0)
+    add(sfx, boom(1.0), 44.2, 0.3)
+    for k, at in enumerate(np.cumsum([0.8, 0.75, 0.7, 0.65, 0.6, 0.55, 0.5, 0.48, 0.46, 0.44, 0.42, 0.4]) + 49.5):
+        if at < 59:
+            add(sfx, heartbeat(), at, 0.8)
+    add(sfx, boom(1.6), 58.3, 0.5)
+
+
+def part8(music, sfx):
+    for k, f in enumerate([261.6, 329.6, 392]):
+        add(music, piano(f, 2.0), 0.3 + k * 1.0, 0.07)
+    add(sfx, glitch(0.4), 3.5, 0.6)
+    add(music, pad([46.2, 69.3, 92.5], 14.0, 0.11), 3.5)
+    for k in range(12):
+        add(sfx, beep(800 + (k % 5) * 110, 0.06, 0.07), 5.2 + k * 0.12)
+    add(sfx, boom(1.2), 13.4, 0.35)
+    add(sfx, rain_noise(28.0, 0.05), 19.0)  # river / wind on the bridge
+    for k in range(int(3.0 / 0.25)):
+        add(sfx, tick(False) * 0.6, 19.2 + k * 0.25, 0.55)
+    add(music, pad([49, 73.4, 98], 14.0, 0.12), 19.0)
+    add(music, pad([36.7, 55, 73.4], 7.5, 0.15), 33.0)
+    add(sfx, boom(1.0), 34.4, 0.3)
+    for k, f in enumerate([220, 196, 174.6, 164.8]):
+        add(music, chime(f), 40.3 + k * 1.6)
+    add(music, pad([130.8, 164.8, 196], 13.0, 0.06), 47.0)
+    t = np.arange(int(2.0 * SR)) / SR
+    add(sfx, np.sin(2 * np.pi * (500 + 600 * t) * t) * env(len(t), 0.2, 0.5) * 0.08, 47.6)
+    for k in range(4):
+        add(sfx, tick(True), 57.0 + k * 0.6, 0.6)
+
+
 def part9(music, sfx):
     add(music, pad([65.4, 98, 130.8], 13.0, 0.09), 0)
     add(sfx, boom(0.8), 0.4, 0.25)
@@ -222,8 +268,11 @@ def main(part, out):
             continue
         a, b, at = map(float, ln.split())
         seg = vo[int(a * SR): int((b + 0.12) * SR)]
+        rms = float(np.sqrt(np.mean(seg ** 2))) if len(seg) else 0.0
+        if 0 < rms < 0.02:  # whispered line: lift it to normal speech level
+            seg = seg * min(8.0, 0.05 / rms)
         add(voice, seg * env(len(seg), 0.01, 0.06), at)
-    {"2": part2, "3": part3, "4": part4, "5": part5, "6": part6, "9": part9}[part](music, sfx)
+    {"2": part2, "3": part3, "4": part4, "5": part5, "6": part6, "7": part7, "8": part8, "9": part9}[part](music, sfx)
     mixd = np.tanh((voice + music * 0.9 + sfx * 0.8) * 1.1) * 0.92
     pcm = (np.clip(mixd, -1, 1) * 32767).astype(np.int16)
     with wave.open(out, "wb") as w:

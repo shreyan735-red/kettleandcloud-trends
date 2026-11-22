@@ -65,7 +65,7 @@ def sc_debt(d, t):
     d.line([0, S(ground), S(W), S(ground)], fill=(40, 40, 50), width=SW(6))
     teen(d, 230, ground, 1.15, c=PALE)
     elder(d, 760, ground, 1.55, arms=[(1.3, 0.2), (0.2, 0.2)])
-    if t < 2.6:
+    if t < 3.0:
         bubble(d, 560, 620, "TWO COLLECTORS BROKE FREE.", 48, 560)
     else:
         bubble(d, 560, 620, "THEIR DEBT DIDN'T DISAPPEAR.", 48, 560)
