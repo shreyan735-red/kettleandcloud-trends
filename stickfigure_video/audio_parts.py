@@ -163,6 +163,57 @@ def part5(music, sfx):
     add(sfx, boom(1.5), 58.4, 0.45)
 
 
+def part6(music, sfx):
+    # sepia flashback: soft piano
+    for k, f in enumerate([261.6, 329.6, 392, 329.6, 293.7]):
+        add(music, piano(f, 2.0), 0.3 + k * 1.3, 0.08)
+    add(sfx, whoosh(0.6), 1.0, 0.5)
+    add(music, pad([110, 164.8, 220], 13.0, 0.05), 7.0)
+    for k in range(3):
+        add(sfx, beep(900 + k * 150, 0.1, 0.09), 15.3 + k * 0.9)
+    add(music, pad([55, 82.4, 110], 8.0, 0.08), 21.0)
+    add(sfx, beep(1200, 0.25, 0.06), 22.6)  # alarm-ish
+    add(sfx, beep(1200, 0.25, 0.06), 23.0)
+    add(music, pad([46.2, 69.3, 92.5], 17.0, 0.12), 29.0)
+    add(sfx, boom(1.0), 29.5, 0.3)
+    add(sfx, heartbeat(), 30.4, 0.8)
+    for k in range(2):
+        add(sfx, boom(0.6), 35.5 + k * 1.4, 0.2)
+    for k in range(6):  # footsteps to the window
+        add(sfx, tick(False) * 0.7, 42.2 + k * 0.25, 0.6)
+    add(sfx, whoosh(0.7), 45.8, 0.7)
+    for k in range(14):
+        add(sfx, beep(800 + (k % 5) * 110, 0.06, 0.07), 46.3 + k * 0.12)
+    add(music, pad([41.2, 61.7, 82.4], 14.0, 0.14), 46.0)
+    for k in range(6):
+        add(sfx, tick(True), 54.6 + k * 0.8, 0.6)
+    add(sfx, boom(1.6), 58.2, 0.5)
+
+
+def part9(music, sfx):
+    add(music, pad([65.4, 98, 130.8], 13.0, 0.09), 0)
+    add(sfx, boom(0.8), 0.4, 0.25)
+    for k in range(10):  # climbing steps
+        add(sfx, tick(False) * 0.6, 6.0 + k * 0.6, 0.5)
+    add(sfx, rain_noise(6.0, 0.04), 13.0)  # crowd/wind bed
+    add(music, pad([73.4, 110, 146.8], 12.0, 0.09), 13.0)
+    for k in range(10):
+        add(sfx, beep(700 + (k % 4) * 150, 0.06, 0.07), 20.4 + k * 0.15)
+    # building hope: chord progression from hands to the end
+    prog = [[261.6, 329.6, 392], [220, 261.6, 329.6], [174.6, 220, 261.6], [196, 246.9, 293.7]]
+    for i in range(14):
+        for j, f in enumerate(prog[i % 4]):
+            add(music, piano(f, 2.2), 25.3 + i * 1.95 + j * 0.12, 0.06 + min(0.05, i * 0.004))
+    add(music, pad([130.8, 164.8, 196], 21.0, 0.06), 25.0)
+    t = np.arange(int(3.0 * SR)) / SR
+    add(sfx, np.sin(2 * np.pi * (300 + 500 * t) * t) * env(len(t), 0.5, 0.8) * 0.10, 39.3)
+    add(sfx, rain_noise(2.5, 0.06), 41.8)  # fire crackle
+    add(music, pad([130.8, 196, 261.6], 14.0, 0.07), 46.0)
+    for i, ch in enumerate([[261.6, 329.6, 392, 523.3], [349.2, 440, 523.3], [261.6, 329.6, 392, 523.3]]):
+        for j, f in enumerate(ch):
+            add(music, piano(f, 3.0), 53.4 + i * 2.2 + j * 0.15, 0.08)
+
+
 def main(part, out):
     vo = load_mp3(f"vo_p{part}.mp3")
     voice, music, sfx = np.zeros(N), np.zeros(N), np.zeros(N)
@@ -172,7 +223,7 @@ def main(part, out):
         a, b, at = map(float, ln.split())
         seg = vo[int(a * SR): int((b + 0.12) * SR)]
         add(voice, seg * env(len(seg), 0.01, 0.06), at)
-    {"2": part2, "3": part3, "4": part4, "5": part5}[part](music, sfx)
+    {"2": part2, "3": part3, "4": part4, "5": part5, "6": part6, "9": part9}[part](music, sfx)
     mixd = np.tanh((voice + music * 0.9 + sfx * 0.8) * 1.1) * 0.92
     pcm = (np.clip(mixd, -1, 1) * 32767).astype(np.int16)
     with wave.open(out, "wb") as w:
