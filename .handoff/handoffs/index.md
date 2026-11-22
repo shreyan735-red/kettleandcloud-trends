@@ -1,0 +1,1 @@
+2026-11-22T15:33:19.471Z | stickfigure studio, stickman video, artifact, animation, video export | Goal: stick-figure video creation tool as a claude.ai Artifact (Stickfigure Studio) at https://claude.ai/artifact/G16nUC | 2026-11-22/handoff-2026-11-22T15-33-19-471Z.md
