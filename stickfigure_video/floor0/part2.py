@@ -273,7 +273,7 @@ def s5_feet(fr, t):
 
 def s6_hale(fr, t):
     knock_end = 0.9
-    op = ease((t - 1.0) / 0.9)
+    op = ease((t - 0.75) / 0.9)
     shake = 0
     if t < knock_end:
         shake = 4 * math.sin(t * 60) * (int(t * 3.3) % 1 == 0)
@@ -287,8 +287,8 @@ def s6_hale(fr, t):
     fr.shake = (shake, 0)
     fr.zoom = lerp(1.0, 1.1, ease((t - 1.5) / 4.0))
     fr.zoom_center = (540, 1000)
-    if t > 5.4:
-        a = ease((t - 5.4) / 0.4)
+    if t > 5.68:
+        a = ease((t - 5.68) / 0.25)
         fr.exposure = 1 - 0.75 * a
         fr.overlay.append(title_overlay("PART 3", 900, 130, (230, 40, 36), a))
 

@@ -57,12 +57,12 @@ def main(out):
     add(sfx, thud(0.45), 19.6)
     add(sfx, drone(4.5, 32.7, 0.1), 19.5)
     # 24-30 knock + door + final hit
-    for k, at in enumerate((24.1, 24.35, 24.6)):
+    for k, at in enumerate((24.05, 24.27, 24.49)):
         add(sfx, knock(0.8), at)
-    add(sfx, slide(1.0, 0.07), 25.0)
+    add(sfx, slide(1.0, 0.07), 24.75)
     add(sfx, hum(4.5, 60, 0.03), 25.0)
-    add(sfx, thud(0.8), 29.4)
-    add(sfx, sting(0.18), 29.4)
+    add(sfx, thud(0.8), 29.7)
+    add(sfx, sting(0.18), 29.7)
 
     for mp3, segf in (("vo2_leo.mp3", "segments2_leo.txt"), ("vo2_hale.mp3", "segments2_hale.txt")):
         if not (os.path.exists(mp3) and os.path.exists(segf)):
