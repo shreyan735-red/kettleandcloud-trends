@@ -118,6 +118,7 @@ class Frame:
         self.fade = 0.0  # 0 = none, 1 = black
         self.zoom = 1.0
         self.zoom_center = (W / 2, H / 2)
+        self.post = None  # optional fn(np image) -> np image, after grading (e.g. CCTV look)
 
     # background ------------------------------------------------------
     def set_bg(self, arr, fig_light=None):
@@ -178,6 +179,8 @@ class Frame:
         g = _grain_pool()[int(self.tg * FPS) % 6]
         g = np.asarray(Image.fromarray(((g * 32) + 128).clip(0, 255).astype(np.uint8)).resize((W, H)), np.float32)
         img += ((g / 255.0) - 0.5)[..., None] * 0.11
+        if self.post is not None:
+            img = self.post(img)
         if self.fade > 0:
             img *= (1 - self.fade)
         out = Image.fromarray((np.clip(img, 0, 1) * 255).astype(np.uint8))
@@ -207,10 +210,18 @@ def _seg(d, p1, p2, w, c, outline=INK, ow=6):
         d.ellipse([p[0] - r, p[1] - r, p[0] + r, p[1] + r], fill=c)
 
 
+HALE = dict(top=(92, 118, 84), top_dk=(70, 92, 64), legs=(70, 66, 74), strings=False, hood=False,
+            glasses=True, bun=True, cane=True)
+
+
 def stickman(frame, x, ground, scale=1.0, facing=1, walk=0.0, arms=None, copy=False, head_turn=0.0,
-             bags=False, sit=False, lean=0.0, eye_glow=1.0):
+             bags=False, sit=False, lean=0.0, eye_glow=1.0, style=None, phone=False, alpha=1.0):
     """Leo (or the Copy). facing: 1 right, -1 left, 0 toward camera, 2 = back to camera.
     head_turn: for back view, 0 = back of head, 1 = fully turned to face camera."""
+    st = style or {}
+    HOODIE_ = st.get("top", HOODIE)
+    HOODIE_DK_ = st.get("top_dk", HOODIE_DK)
+    JEANS_ = st.get("legs", JEANS)
     k = scale * SS
     bw, bh = int(260 * k), int(560 * k)
     box = Image.new("RGBA", (bw, bh), (0, 0, 0, 0))
@@ -226,8 +237,8 @@ def stickman(frame, x, ground, scale=1.0, facing=1, walk=0.0, arms=None, copy=Fa
         for i, off in enumerate((-12, 12)):
             knee = (hip[0] + 62 * k * f, hip[1] + 4 * k)
             foot = (knee[0] + 6 * k * f, knee[1] + 58 * k)
-            _seg(d, (hip[0] + off * k * 0.3, hip[1]), knee, 26 * k, JEANS, ow=5 * k)
-            _seg(d, knee, foot, 24 * k, JEANS, ow=5 * k)
+            _seg(d, (hip[0] + off * k * 0.3, hip[1]), knee, 26 * k, JEANS_, ow=5 * k)
+            _seg(d, knee, foot, 24 * k, JEANS_, ow=5 * k)
             d.ellipse([foot[0] - 12 * k, foot[1] - 8 * k, foot[0] + 26 * k * f if f > 0 else foot[0] + 12 * k,
                        foot[1] + 12 * k], fill=SKIN, outline=INK, width=int(4 * k)) if f > 0 else \
                 d.ellipse([foot[0] - 26 * k, foot[1] - 8 * k, foot[0] + 12 * k, foot[1] + 12 * k],
@@ -243,8 +254,8 @@ def stickman(frame, x, ground, scale=1.0, facing=1, walk=0.0, arms=None, copy=Fa
                 sx = -16 if ph == 0 else 16
                 knee = (hip[0] + sx * k, hip[1] + 50 * k)
                 foot = (hip[0] + sx * 1.3 * k, gy)
-            _seg(d, hip, knee, 26 * k, JEANS, ow=5 * k)
-            _seg(d, knee, foot, 24 * k, JEANS, ow=5 * k)
+            _seg(d, hip, knee, 26 * k, JEANS_, ow=5 * k)
+            _seg(d, knee, foot, 24 * k, JEANS_, ow=5 * k)
             if side:
                 d.ellipse([foot[0] - 14 * k if f > 0 else foot[0] - 30 * k, foot[1] - 9 * k,
                            foot[0] + 30 * k if f > 0 else foot[0] + 14 * k, foot[1] + 11 * k],
@@ -253,15 +264,16 @@ def stickman(frame, x, ground, scale=1.0, facing=1, walk=0.0, arms=None, copy=Fa
                 d.ellipse([foot[0] - 17 * k, foot[1] - 10 * k, foot[0] + 17 * k, foot[1] + 12 * k],
                           fill=SKIN, outline=INK, width=int(4 * k))
     # hood behind the head (visible from back / sides)
-    d.ellipse([neck[0] - 40 * k, neck[1] - 30 * k, neck[0] + 40 * k, neck[1] + 22 * k],
-              fill=HOODIE_DK, outline=INK, width=int(5 * k))
+    if st.get("hood", True):
+      d.ellipse([neck[0] - 40 * k, neck[1] - 30 * k, neck[0] + 40 * k, neck[1] + 22 * k],
+              fill=HOODIE_DK_, outline=INK, width=int(5 * k))
     # torso (hoodie)
     tw = 36 * k
     torso = [(neck[0] - tw, neck[1] + 6 * k), (neck[0] + tw, neck[1] + 6 * k),
              (hip[0] + tw * 0.95, hip[1] + 14 * k), (hip[0] - tw * 0.95, hip[1] + 14 * k)]
-    d.polygon(torso, fill=HOODIE, outline=INK, width=int(6 * k))
-    d.line([(hip[0] - tw * 0.9, hip[1] - 2 * k), (hip[0] + tw * 0.9, hip[1] - 2 * k)], fill=HOODIE_DK, width=int(7 * k))
-    if facing != 2:  # drawstrings
+    d.polygon(torso, fill=HOODIE_, outline=INK, width=int(6 * k))
+    d.line([(hip[0] - tw * 0.9, hip[1] - 2 * k), (hip[0] + tw * 0.9, hip[1] - 2 * k)], fill=HOODIE_DK_, width=int(7 * k))
+    if facing != 2 and st.get("strings", True):  # drawstrings
         for sx in (-10, 10):
             x0 = neck[0] + sx * k * (0.5 if side else 1)
             d.line([(x0, neck[1] + 10 * k), (x0 + sx * 0.15 * k, neck[1] + 52 * k)], fill=(235, 235, 232), width=int(4 * k))
@@ -279,8 +291,8 @@ def stickman(frame, x, ground, scale=1.0, facing=1, walk=0.0, arms=None, copy=Fa
         el = (s0[0] + math.sin(a_up) * 48 * k * fx, s0[1] + math.cos(a_up) * 48 * k)
         a2 = a_up + a_low
         hd = (el[0] + math.sin(a2) * 44 * k * fx, el[1] + math.cos(a2) * 44 * k)
-        _seg(d, s0, el, 22 * k, HOODIE, ow=5 * k)
-        _seg(d, el, hd, 20 * k, HOODIE, ow=5 * k)
+        _seg(d, s0, el, 22 * k, HOODIE_, ow=5 * k)
+        _seg(d, el, hd, 20 * k, HOODIE_, ow=5 * k)
         d.ellipse([hd[0] - 11 * k, hd[1] - 11 * k, hd[0] + 11 * k, hd[1] + 11 * k], fill=SKIN, outline=INK, width=int(4 * k))
         hands.append(hd)
     if bags:  # paper grocery bag in the lower hand
@@ -311,8 +323,33 @@ def stickman(frame, x, ground, scale=1.0, facing=1, walk=0.0, arms=None, copy=Fa
             else:
                 rr = 4.5 * k
                 d.ellipse([ex - rr, ey - rr, ex + rr, ey + rr], fill=INK)
+    if st.get("bun"):
+        bx = head[0] - (14 * k * f if side else 0)
+        by = head[1] - r - 6 * k
+        d.ellipse([bx - 20 * k, by - 18 * k, bx + 20 * k, by + 16 * k], fill=(176, 176, 172), outline=INK, width=int(5 * k))
+        d.chord([head[0] - r, head[1] - r, head[0] + r, head[1] + r], 190, 350, fill=(176, 176, 172), outline=INK, width=int(5 * k))
+    if st.get("glasses") and show_face:
+        gsp = max(spread, 12)
+        gc = ex0 + (6 * f if side else 0)
+        for sx in (-1, 1):
+            lx_, ly_ = head[0] + (gc + sx * gsp) * k, head[1] - 2 * k
+            gr = 10 * k
+            d.ellipse([lx_ - gr, ly_ - gr, lx_ + gr, ly_ + gr], outline=INK, width=int(4 * k))
+        d.line([(head[0] + (gc - gsp) * k + 10 * k, head[1] - 4 * k), (head[0] + (gc + gsp) * k - 10 * k, head[1] - 4 * k)],
+               fill=INK, width=int(4 * k))
+    if st.get("cane"):
+        hx, hy = hands[0]
+        d.line([(hx, hy - 6 * k), (hx + 6 * k * f, gy)], fill=(70, 46, 30), width=int(9 * k))
+        d.arc([hx - 18 * k, hy - 22 * k, hx + 10 * k, hy + 6 * k], 180, 360, fill=(70, 46, 30), width=int(9 * k))
+    if phone:
+        hx, hy = hands[0]
+        d.rounded_rectangle([hx - 16 * k, hy - 30 * k, hx + 16 * k, hy + 26 * k], radius=int(6 * k), fill=(30, 32, 40),
+                            outline=INK, width=int(3 * k))
+        d.rectangle([hx - 12 * k, hy - 25 * k, hx + 12 * k, hy + 20 * k], fill=(190, 215, 255))
     # downsample + paste
     small = box.resize((bw // SS, bh // SS), Image.LANCZOS)
+    if alpha < 1.0:
+        small.putalpha(small.getchannel("A").point(lambda v: int(v * alpha)))
     px = int(x - (bw // SS) / 2)
     py = int(ground - (bh // SS) + 40 * scale)
     frame.fig.alpha_composite(small, (max(0, px), max(0, py)), (max(0, -px), max(0, -py)))
