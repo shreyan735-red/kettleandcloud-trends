@@ -281,12 +281,12 @@ def s2_hover(fr, t):
 
 
 def s3_press(fr, t):
-    reach = ease(t / 0.5) if t < 1.0 else lerp(1.0, 0.3, ease((t - 1.0) / 0.6))
+    reach = lerp(0.6, 1.0, ease((t - 1.4) / 0.55)) if t < 2.2 else lerp(1.0, 0.3, ease((t - 2.2) / 0.6))
     leo_in_elevator(fr, t, reach=reach)
-    if t > 0.8:  # the drop: buzzing lights, shake
+    if t > 2.05:  # the drop: buzzing lights, shake
         rnd = random.Random(int(t * 30))
         fr.exposure = 0.35 + 0.65 * (1 if rnd.random() > 0.28 else rnd.random() * 0.3)
-        amp = 14 * (1 - ease((t - 2.8) / 1.2)) if t < 4.0 else 0
+        amp = 16 * (1 - ease((t - 3.2) / 0.8)) if t < 4.0 else 0
         fr.shake = (rnd.uniform(-amp, amp), rnd.uniform(-amp, amp))
     fr.zoom = 1.08
     fr.zoom_center = (700, 1100)
@@ -345,8 +345,8 @@ def s7_twelve(fr, t):
     stickman(fr, 700, 1760, 2.3, facing=-1, arms=[(0.15, 0.1), (0.1, 0.2)], bags=True)
     fr.zoom = lerp(1.0, 1.1, ease(t / 4))
     fr.zoom_center = (420, 1050)
-    if t > 2.7:
-        a = ease((t - 2.7) / 0.5)
+    if t > 3.3:
+        a = ease((t - 3.3) / 0.4)
         fr.exposure = 1 - 0.75 * a
         fr.overlay.append(title_overlay("PART 2", 900, 130, (230, 40, 36), a))
 

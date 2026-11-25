@@ -125,10 +125,10 @@ def main(out):
     # 3-8 elevator: hum continues, quiet
     add(sfx, hum(5.5, 55, 0.05), 7.5)
     # 8-12 press + drop + buzzing lights
-    add(sfx, click(0.5), 8.45)
-    add(sfx, drop(), 8.8)
-    add(sfx, buzz(3.0, 0.09), 8.9)
-    add(sfx, thud(0.5), 11.6)
+    add(sfx, click(0.5), 9.95)
+    add(sfx, drop(), 10.1)
+    add(sfx, buzz(1.9, 0.09), 10.1)
+    add(sfx, thud(0.5), 11.85)
     # 12-17 doors open on floor zero: cold drone
     add(sfx, ding(523, 0.07), 12.0)
     add(sfx, slide(1.6, 0.16), 12.1)
@@ -147,15 +147,15 @@ def main(out):
     # 26-30 floor 12: quiet, warm hum, final hit
     add(sfx, hum(4.0, 60, 0.035), 26.0)
     add(sfx, drone(4.0, 41.2, 0.06), 26.0)
-    add(sfx, thud(0.8), 28.75)
-    add(sfx, sting(0.18), 28.75)
+    add(sfx, thud(0.8), 29.3)
+    add(sfx, sting(0.18), 29.3)
 
     if os.path.exists("vo1.mp3") and os.path.exists("segments1.txt"):
         vo = load_mp3("vo1.mp3")
         for ln in open("segments1.txt"):
             if ln.startswith("#") or not ln.strip():
                 continue
-            a, b, at = map(float, ln.split())
+            a, b, at = list(map(float, ln.split()))[:3]
             seg = vo[int(a * SR): int((b + 0.1) * SR)]
             rms = float(np.sqrt(np.mean(seg ** 2))) if len(seg) else 0
             if 0 < rms < 0.02:
